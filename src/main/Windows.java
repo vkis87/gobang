@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 public class Windows extends JFrame implements MouseListener {
     public Core core;
     private static final long serialVersionUID = 1L;
-    private int var = 1;
+    private int var = 2;
     public Windows(String title) {
         super(title);
         core = new Core(19, 19);
@@ -87,6 +87,8 @@ public class Windows extends JFrame implements MouseListener {
             if(a!=-1) {
                 if(var==1) var=2;
                 else if(var==2) var=1;
+                // 印出盤面
+                this.printCore();
             }
         }
         else if(e.getX()>690&&e.getX()<760&&e.getY()>60&&e.getY()<90) {
@@ -129,5 +131,14 @@ public class Windows extends JFrame implements MouseListener {
             return y / 30;
         else
             return y / 30 + 1;
+    }
+
+    private void printCore() {
+        for(int[] cx: this.core.getCore()) {
+            for(int cy: cx) {
+                System.out.print(cy + "");
+            }
+            System.out.println();
+        }
     }
 }
