@@ -15,11 +15,13 @@ public class Windows extends JFrame implements MouseListener {
     public Core core;
     private static final long serialVersionUID = 1L;
     private int var = 2;
+    private final int coreSizeX = 15;
+    private final int coreSizeY = 15;
     public Windows(String title) {
         super(title);
-        core = new Core(19, 19);
+        core = new Core(coreSizeX, coreSizeY);
         this.setSize(800, 600);
-        this.setLocation(800, 300);
+        this.setLocation(400, 100);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setResizable(false);
@@ -31,15 +33,15 @@ public class Windows extends JFrame implements MouseListener {
         // TODO Auto-generated method stub
         super.paint(g);
         // 横
-        for (int i = 0; i < 19; i++)
-            g.drawLine(30, 30 + i * 30, 570, 30 + i * 30);
+        for (int i = 0; i < coreSizeX; i++)
+            g.drawLine(30, 60 + i * 30, 30 + (coreSizeY - 1) * 30, 60 + i * 30);
         // 竖线
-        for (int i = 0; i < 19; i++)
-            g.drawLine(30 + i * 30, 60, 30 + i * 30, 570);
+        for (int i = 0; i < coreSizeY; i++)
+            g.drawLine(30 + i * 30, 60, 30 + i * 30, 60 + (coreSizeX - 1) * 30);
 
         int[][] board = core.getCore();
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
+        for (int i = 0; i < coreSizeX; i++) {
+            for (int j = 0; j < coreSizeY; j++) {
                 if (board[i][j] == 1)
                     g.drawOval(20 + i * 30, 50 + j * 30, 20, 20);
                 if(board[i][j]==2)
@@ -75,7 +77,9 @@ public class Windows extends JFrame implements MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
-        if (e.getX() < 570 && e.getY() < 570) {
+        if (e.getX() < (45 + (coreSizeY - 1) * 30)
+        && e.getY() < (75 + (coreSizeX - 1) * 30)
+        && e.getX() > 15 && e.getY() > 45 ) {
             int a = core.ChessIt(_CgetX(e.getX()), (_CgetY(e.getY())), var);
             this.repaint();
             if (a == 1) {
