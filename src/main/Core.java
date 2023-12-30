@@ -30,7 +30,7 @@ public class Core {
         this.y=y;
     }
     //检查该地是否有空位置
-    private boolean __CanInput(int x,int y) {
+    public boolean __CanInput(int x,int y) {
         if(core[x][y]==0) return true;
         else return false;
     }

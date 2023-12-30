@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 /**
  *
  * @author GodofOrange
@@ -17,6 +18,11 @@ public class Windows extends JFrame implements MouseListener {
     private int var = 2;
     private final int coreSizeX = 15;
     private final int coreSizeY = 15;
+    // 先後手的禁手檢測器
+    private int initiative = this.var;
+    private ForbiddenChecker initiativeChecker;
+    private ForbiddenChecker goteChecker;
+
     public Windows(String title) {
         super(title);
         core = new Core(coreSizeX, coreSizeY);
@@ -26,6 +32,8 @@ public class Windows extends JFrame implements MouseListener {
         this.setVisible(true);
         this.setResizable(false);
         this.addMouseListener(this);
+        this.initiativeChecker = new ForbiddenChecker(true);
+        this.goteChecker = new ForbiddenChecker(false);
     }
 
     @Override
@@ -44,17 +52,17 @@ public class Windows extends JFrame implements MouseListener {
             for (int j = 0; j < coreSizeY; j++) {
                 if (board[i][j] == 1)
                     g.drawOval(20 + i * 30, 50 + j * 30, 20, 20);
-                if(board[i][j]==2)
-                    g.fillOval(20+i*30, 50+j*30, 20, 20);
+                if (board[i][j] == 2)
+                    g.fillOval(20 + i * 30, 50 + j * 30, 20, 20);
             }
         }
-        g.drawRect(690,60, 50, 30);
-        g.drawString("悔棋",700,80);
-        g.drawRect(690,120,50, 30);
-        g.drawString("开始",700,140);
-        g.drawRect(690,180,50, 30);
-        g.drawString("设置",700,200);
-        g.drawString("Code by 秃桔子 QQ:1243137612", 600,260);
+        g.drawRect(690, 60, 50, 30);
+        g.drawString("悔棋", 700, 80);
+        g.drawRect(690, 120, 50, 30);
+        g.drawString("开始", 700, 140);
+        g.drawRect(690, 180, 50, 30);
+        g.drawString("设置", 700, 200);
+        g.drawString("Code by 秃桔子 QQ:1243137612", 600, 260);
     }
 
     @Override
@@ -80,7 +88,19 @@ public class Windows extends JFrame implements MouseListener {
         if (e.getX() < (45 + (coreSizeY - 1) * 30)
         && e.getY() < (75 + (coreSizeX - 1) * 30)
         && e.getX() > 15 && e.getY() > 45 ) {
-            int a = core.ChessIt(_CgetX(e.getX()), (_CgetY(e.getY())), var);
+            int x = _CgetX(e.getX());
+            int y = _CgetY(e.getY());
+            if(!core.__CanInput(x, y)) {
+                return;
+            }
+            // 檢查禁手
+            Move move = new Move(x, y, var);
+            if(var == this.initiative && this.initiativeChecker.check(core, move)) {
+                JOptionPane.showMessageDialog(null, this.initiativeChecker.message, "禁手", JOptionPane.DEFAULT_OPTION);
+            } else if(var != this.initiative && this.goteChecker.check(core, move)) {
+                JOptionPane.showMessageDialog(null, this.goteChecker.message, "禁手", JOptionPane.DEFAULT_OPTION);
+            }
+            int a = core.ChessIt(x, y, var);
             this.repaint();
             if (a == 1) {
                 JOptionPane.showMessageDialog(null,"白的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);;
@@ -110,6 +130,7 @@ public class Windows extends JFrame implements MouseListener {
             int n = JOptionPane.showOptionDialog(null,"红先还是黑先？","游戏设置",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE, null,options,options[0]);
             if(n==0) this.var=1;
             if(n==1) this.var=2;
+            this.initiative = this.var;
             this.core.Restart();
             this.repaint();
         }
@@ -138,8 +159,8 @@ public class Windows extends JFrame implements MouseListener {
     }
 
     private void printCore() {
-        for(int[] cx: this.core.getCore()) {
-            for(int cy: cx) {
+        for (int[] cx : this.core.getCore()) {
+            for (int cy : cx) {
                 System.out.print(cy + "");
             }
             System.out.println();
