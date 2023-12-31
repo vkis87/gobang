@@ -193,11 +193,12 @@ public class ForbiddenChecker {
         int numOfLivingThree = 0;
         int counter = 0;
         int missCounter = 0;
+        boolean living = true;
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) == targetValue) {
                 counter++;
                 missCounter = 0;
-                if (counter == 3) {
+                if (living && counter == 3 && (array.size()-1 >= i+1) && (array.get(i+1) == backgroundValue)) {
                     counter = 1;
                     missCounter = 0;
                     numOfLivingThree++;
@@ -205,7 +206,9 @@ public class ForbiddenChecker {
             } else if (array.get(i) != backgroundValue) {
                 counter = 0;
                 missCounter = 0;
+                living = false;
             } else if (array.get(i) == backgroundValue) {
+                living = true;
                 missCounter++;
                 if (missCounter > 1) {
                     counter = 0;
