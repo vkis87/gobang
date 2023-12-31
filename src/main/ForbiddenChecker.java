@@ -36,12 +36,18 @@ public class ForbiddenChecker {
 
     // 長連
     public boolean checkSix(Core core, Move move) {
+        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move, true);
+        for (ArrayList<Integer> array : testTingPosition) {
+            if (checkSixInArray(move.getChessColor(), array)) {
+                return true;
+            }
+        }
         return false;
     }
 
     // 雙四
     public boolean checkDoubleFour(Core core, Move move) {
-        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move);
+        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move, false);
         int counter = 0;
         for (ArrayList<Integer> array : testTingPosition) {
             counter += checkFourInArray(move.getChessColor(), 0, array);
@@ -54,7 +60,7 @@ public class ForbiddenChecker {
 
     // 雙三
     public boolean checkDoubleThree(Core core, Move move) {
-        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move);
+        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move, false);
         int counter = 0;
         for (ArrayList<Integer> array : testTingPosition) {
             if (checkLivingThreeInArray(move.getChessColor(), 0, array)) {
@@ -67,7 +73,7 @@ public class ForbiddenChecker {
         return false;
     }
 
-    private ArrayList<ArrayList<Integer>> genTestingPositions(Core core, Move move) {
+    private ArrayList<ArrayList<Integer>> genTestingPositions(Core core, Move move, boolean sixMode) {
         int[][] board = Arrays.copyOf(core.getCore(), core.getCore().length);
         for (int i = 0; i < board.length; i++) {
             board[i] = Arrays.copyOf(core.getCore()[i], core.getCore()[i].length);
@@ -79,6 +85,13 @@ public class ForbiddenChecker {
         int yMax = y + 4;
         int xMin = x - 4;
         int yMin = y - 4;
+        // 偵測長連擴大範圍
+        if(sixMode) {
+            xMax++;
+            yMax++;
+            xMin--;
+            yMin--;
+        }
         if(xMax >= board.length) xMax = board.length-1;
         if(yMax >= board[0].length) yMax = board[0].length-1;
         if(xMin < 0) xMin = 0;
@@ -134,6 +147,21 @@ public class ForbiddenChecker {
         return result;
     }
 
+    private boolean checkSixInArray(int targetValue, ArrayList<Integer> array) {
+        int counter = 0;
+        for (int i = 0; i < array.size(); i++) {
+            if (array.get(i) == targetValue) {
+                counter++;
+                if (counter >= 6) {
+                    return true;
+                }
+            } else {
+                counter = 0;
+            }
+        }
+        return false;
+    }
+
     private int checkFourInArray(int targetValue, int backgroundValue, ArrayList<Integer> array) {
         int numOfFour = 0;
         int counter = 0;
@@ -186,7 +214,7 @@ public class ForbiddenChecker {
             }
         }
         // 單條線上有兩個活三 會成為不算四
-        return (numOfLivingThree == 1) ? true : false;
+        return (numOfLivingThree == 1);
     }
 
     public void setInitiative(boolean initiative) {
