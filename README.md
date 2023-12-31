@@ -1,20 +1,20 @@
 # gobang
 基於其他人開發的五子棋，加入偵測部分禁手的功能。
 <h2>class Move</h2>
-<h3>constructor: Move(int x, int y, int chessColor)</h3>
+<p>constructor: Move(int x, int y, int chessColor)</p>
 <p>用於給ForbiddenChecker檢查用之落子點及顏色</p>
 <h2>class ForbiddenChecker</h2>
-<h3>constructor: ForbiddenChecker(boolean initiative)</h3>
+<p>constructor: ForbiddenChecker(boolean initiative)</p>
 <p>initiative為是否先手</p>
-<h3>check(Core core, Move move)</h3>
+<p>check(Core core, Move move)</p>
 <p>檢查是否觸發禁手並產生訊息</p>
-<h3>getCheckMessage()</h3>
+<p>getCheckMessage()</p>
 <p>取得上次執行check的訊息</p>
-<h3>checkSix(Core core, Move move)</h3>
-<p>長連(未完成)</p>
-<h3>checkDoubleFour(Core core, Move move)</h3>
+<p>checkSix(Core core, Move move)</p>
+<p>長連</p>
+<p>checkDoubleFour(Core core, Move move)</p>
 <p>雙四</p>
-<h3>checkDoubleThree(Core core, Move move)</h3>
+<p>checkDoubleThree(Core core, Move move)</p>
 <p>雙三</p>
 
 <h1>以下為原作者之README</h1>
