@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ForbiddenChecker {
     private boolean initiative;
@@ -18,16 +19,16 @@ public class ForbiddenChecker {
     // 檢查是否觸發禁手 並在this.message中留下訊息
     public boolean check(Core core, Move move) {
         this.checkMessage = "";
-        if(this.initiative && (this.checkSix(core, move))) {
+        if (this.initiative && (this.checkSix(core, move))) {
             this.checkMessage = "長連";
-            return true;    
-        }
-        if(this.checkDoubleThree(core, move)) {
-            this.checkMessage = "雙三";
             return true;
         }
-        if(this.checkDoubleFour(core, move)) {
+        if (this.initiative && this.checkDoubleFour(core, move)) {
             this.checkMessage = "雙四";
+            return true;
+        }
+        if (this.initiative && this.checkDoubleThree(core, move)) {
+            this.checkMessage = "雙三";
             return true;
         }
         return false;
@@ -40,14 +41,12 @@ public class ForbiddenChecker {
 
     // 雙四
     public boolean checkDoubleFour(Core core, Move move) {
-        ArrayList<int[]> testTimgPosition = genTestingPositions(core, move);
+        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move);
         int counter = 0;
-        for(int[] array : testTimgPosition) {
-            if(checkLivingFourInArray(move.getChessColor(), 0, array)) {
-                counter++;
-                if(counter == 2) {
-                    return true;
-                }
+        for (ArrayList<Integer> array : testTingPosition) {
+            counter += checkFourInArray(move.getChessColor(), 0, array);
+            if (counter == 2) {
+                return true;
             }
         }
         return false;
@@ -55,12 +54,12 @@ public class ForbiddenChecker {
 
     // 雙三
     public boolean checkDoubleThree(Core core, Move move) {
-        ArrayList<int[]> testTimgPosition = genTestingPositions(core, move);
+        ArrayList<ArrayList<Integer>> testTingPosition = genTestingPositions(core, move);
         int counter = 0;
-        for(int[] array : testTimgPosition) {
-            if(checkLivingThreeInArray(move.getChessColor(), 0, array)) {
+        for (ArrayList<Integer> array : testTingPosition) {
+            if (checkLivingThreeInArray(move.getChessColor(), 0, array)) {
                 counter++;
-                if(counter == 2) {
+                if (counter == 2) {
                     return true;
                 }
             }
@@ -68,120 +67,132 @@ public class ForbiddenChecker {
         return false;
     }
 
-    private ArrayList<int[]> genTestingPositions(Core core, Move move) {
-        int[][] board = core.getCore();
-        ArrayList<int[]> result = new ArrayList<int[]>();
-        int x = move.getPositionX();
-        int y = move.getPositionY();    
-        for (int i = 0; i < 6; i++) {
-            // 斜方向
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x + i - j][y + i - j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x - i + j][y - i + j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x + i - j][y - i + j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x - i + j][y + i - j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-
-            // 直方向
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x + i - j][y];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x - i + j][y];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x][y + i - j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
-            try {
-                int[] buf = new int[6];
-                for (int j = 0; j < 6; j++) {
-                    buf[j] = board[x][y - i + j];
-                }
-                result.add(buf);
-            } catch (IndexOutOfBoundsException e) {}
+    private ArrayList<ArrayList<Integer>> genTestingPositions(Core core, Move move) {
+        int[][] board = Arrays.copyOf(core.getCore(), core.getCore().length);
+        for (int i = 0; i < board.length; i++) {
+            board[i] = Arrays.copyOf(core.getCore()[i], core.getCore()[i].length);
         }
+        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+        int x = move.getPositionX();
+        int y = move.getPositionY();
+        int xMax = x + 4;
+        int yMax = y + 4;
+        int xMin = x - 4;
+        int yMin = y - 4;
+        if(xMax >= board.length) xMax = board.length-1;
+        if(yMax >= board[0].length) yMax = board[0].length-1;
+        if(xMin < 0) xMin = 0;
+        if(yMin < 0) yMin = 0;
+        // 落子後的盤面
+        board[x][y] = move.getChessColor();
+        // 斜向
+        int i = x;
+        int j = y;
+        while (i > xMin && j > yMin) {
+            i--;
+            j--;
+        }
+        ArrayList<Integer> buf = new ArrayList<Integer>();
+        while (i <= xMax && j <= yMax) {
+            buf.add(board[i][j]);
+            i++;
+            j++;
+        }
+        result.add(buf);
+        // 另一方向斜向
+        i = x;
+        j = y;
+        while (i > xMin && j < yMax) {
+            i--;
+            j++;
+        }
+        buf = new ArrayList<Integer>();
+        while (i <= xMax && j >= xMin) {
+            buf.add(board[i][j]);
+            i++;
+            j--;
+        }
+        result.add(buf);
+        // 縱向
+        i = xMin;
+        j = y;
+        buf = new ArrayList<Integer>();
+        while (i <= xMax) {
+            buf.add(board[i][j]);
+            i++;
+        }
+        result.add(buf);
+        // 橫向
+        i = x;
+        j = yMin;
+        buf = new ArrayList<Integer>();
+        while (j <= yMax) {
+            buf.add(board[i][j]);
+            j++;
+        }
+        result.add(buf);
         return result;
     }
 
-    private boolean checkLivingFourInArray(int targetValue, int backgroundValue, int[] array) {
-        if(array.length != 6) {
-            return false;
+    private int checkFourInArray(int targetValue, int backgroundValue, ArrayList<Integer> array) {
+        int numOfFour = 0;
+        int counter = 0;
+        int missCounter = 0;
+        for (int i = 0; i < array.size(); i++) {
+            if (array.get(i) == targetValue) {
+                counter++;
+                missCounter = 0;
+                if (counter == 4) {
+                    counter = 1;
+                    missCounter = 0;
+                    numOfFour++;
+                }
+            } else if (array.get(i) != backgroundValue) {
+                counter = 0;
+                missCounter = 0;
+            } else if (array.get(i) == backgroundValue) {
+                missCounter++;
+                if (missCounter > 1) {
+                    counter = 0;
+                    missCounter = 0;
+                }
+            }
         }
-        return ( array[0] == backgroundValue )
-                && ( array[1] == targetValue)
-                && ( array[2] == targetValue)
-                && ( array[3] == targetValue)
-                && ( array[4] == targetValue)
-                && ( array[5] == backgroundValue);
+        return numOfFour;
     }
 
-    private boolean checkLivingThreeInArray(int targetValue, int backgroundValue, int[] array) {
-        if(array.length != 6) {
-            return false;
+    private boolean checkLivingThreeInArray(int targetValue, int backgroundValue, ArrayList<Integer> array) {
+        int numOfLivingThree = 0;
+        int counter = 0;
+        int missCounter = 0;
+        for (int i = 0; i < array.size(); i++) {
+            if (array.get(i) == targetValue) {
+                counter++;
+                missCounter = 0;
+                if (counter == 3) {
+                    counter = 1;
+                    missCounter = 0;
+                    numOfLivingThree++;
+                }
+            } else if (array.get(i) != backgroundValue) {
+                counter = 0;
+                missCounter = 0;
+            } else if (array.get(i) == backgroundValue) {
+                missCounter++;
+                if (missCounter > 1) {
+                    counter = 0;
+                    missCounter = 0;
+                }
+            }
         }
-        return (( array[0] == backgroundValue )
-                && ( array[1] == backgroundValue)
-                && ( array[2] == targetValue)
-                && ( array[3] == targetValue)
-                && ( array[4] == targetValue)
-                && ( array[5] == backgroundValue))
-            ||(( array[0] == backgroundValue )
-                && ( array[1] == targetValue)
-                && ( array[2] == backgroundValue)
-                && ( array[3] == targetValue)
-                && ( array[4] == targetValue)
-                && ( array[5] == backgroundValue))
-            ||(( array[0] == backgroundValue )
-                && ( array[1] == targetValue)
-                && ( array[2] == targetValue)
-                && ( array[3] == backgroundValue)
-                && ( array[4] == targetValue)
-                && ( array[5] == backgroundValue))
-            ||(( array[0] == backgroundValue )
-                && ( array[1] == targetValue)
-                && ( array[2] == targetValue)
-                && ( array[3] == targetValue)
-                && ( array[4] == backgroundValue)
-                && ( array[5] == backgroundValue));
+        // 單條線上有兩個活三 會成為不算四
+        return (numOfLivingThree == 1) ? true : false;
     }
 
     public void setInitiative(boolean initiative) {
         this.initiative = initiative;
     }
+
     public boolean getInitiative() {
         return this.initiative;
     }

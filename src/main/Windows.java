@@ -96,9 +96,9 @@ public class Windows extends JFrame implements MouseListener {
             // 檢查禁手
             Move move = new Move(x, y, var);
             if(var == this.initiative && this.initiativeChecker.check(core, move)) {
-                JOptionPane.showMessageDialog(null, this.initiativeChecker.message, "禁手", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(null, this.initiativeChecker.getCheckMessage(), "禁手", JOptionPane.DEFAULT_OPTION);
             } else if(var != this.initiative && this.goteChecker.check(core, move)) {
-                JOptionPane.showMessageDialog(null, this.goteChecker.message, "禁手", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(null, this.goteChecker.getCheckMessage(), "禁手", JOptionPane.DEFAULT_OPTION);
             }
             int a = core.ChessIt(x, y, var);
             this.repaint();
@@ -111,8 +111,6 @@ public class Windows extends JFrame implements MouseListener {
             if(a!=-1) {
                 if(var==1) var=2;
                 else if(var==2) var=1;
-                // 印出盤面
-                this.printCore();
             }
         }
         else if(e.getX()>690&&e.getX()<760&&e.getY()>60&&e.getY()<90) {
@@ -122,6 +120,7 @@ public class Windows extends JFrame implements MouseListener {
             this.repaint();
         }
         if(e.getX()>690&&e.getX()<760&&e.getY()>120&&e.getY()<150) {
+            this.var = this.initiative;
             core.Restart();
             this.repaint();
         }
