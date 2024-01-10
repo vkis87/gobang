@@ -166,11 +166,12 @@ public class ForbiddenChecker {
         int numOfFour = 0;
         int counter = 0;
         int missCounter = 0;
+        boolean canWin = false;
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) == targetValue) {
                 counter++;
-                missCounter = 0;
-                if (counter == 4) {
+                if(counter == 1) missCounter = 0;
+                if (counter == 4 && (canWin || (i+1 < array.size()) && array.get(i+1) == backgroundValue)) {
                     counter = 1;
                     missCounter = 0;
                     numOfFour++;
@@ -178,7 +179,9 @@ public class ForbiddenChecker {
             } else if (array.get(i) != backgroundValue) {
                 counter = 0;
                 missCounter = 0;
+                canWin = false;
             } else if (array.get(i) == backgroundValue) {
+                if(missCounter == 0) canWin = true;
                 missCounter++;
                 if (missCounter > 1) {
                     counter = 0;
@@ -197,7 +200,7 @@ public class ForbiddenChecker {
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) == targetValue) {
                 counter++;
-                missCounter = 0;
+                if(counter == 1) missCounter = 0;
                 if (living && counter == 3 && (array.size()-1 >= i+1) && (array.get(i+1) == backgroundValue)) {
                     counter = 1;
                     missCounter = 0;

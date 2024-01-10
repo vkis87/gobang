@@ -156,13 +156,4 @@ public class Windows extends JFrame implements MouseListener {
         else
             return y / 30 + 1;
     }
-
-    private void printCore() {
-        for (int[] cx : this.core.getCore()) {
-            for (int cy : cx) {
-                System.out.print(cy + "");
-            }
-            System.out.println();
-        }
-    }
 }
