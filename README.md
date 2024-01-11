@@ -17,6 +17,8 @@
 <p>checkDoubleThree(Core core, Move move)</p>
 <p>雙三</p>
 
+<a src="https://github.com/chenxin12138/repository/tree/master/Gobang">AI參考</a>
+
 <h1>以下為原作者之README</h1>
 基于Java开发的基础版五子棋！希望能帮助到大家！您的每个star对我都十分珍贵！
 
