@@ -127,11 +127,15 @@ public class Windows extends JFrame implements MouseListener {
                 }
             }
         } else if (e.getX() > 690 && e.getX() < 760 && e.getY() > 60 && e.getY() < 90) {
-            core.RetChess();
-            if (var == 1)
-                var = 2;
-            else if (var == 2)
-                var = 1;
+            int color = core.RetChess();
+            if(color != 0)
+            {
+                this.var = color;
+            }
+            // if (var == 1)
+            //     var = 2;
+            // else if (var == 2)
+            //     var = 1;
             this.repaint();
         }
         if (e.getX() > 690 && e.getX() < 760 && e.getY() > 120 && e.getY() < 150) {

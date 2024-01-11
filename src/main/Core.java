@@ -101,11 +101,12 @@ public class Core {
         else return -1;
     }
     //悔棋
-    public boolean RetChess() {
-        if(stack.isEmpty()) return false;
+    public int RetChess() {
+        if(stack.isEmpty()) return 0;
         Chess chess = stack.pop();
-        core[chess.x][chess.y]= 0;
-        return true;
+        int buf = core[chess.x][chess.y];
+        core[chess.x][chess.y] = 0;
+        return buf;
     }
     //获得棋盘状态
     public int[][] getCore(){
