@@ -51,7 +51,7 @@ public class ForbiddenChecker {
         int counter = 0;
         for (ArrayList<Integer> array : testTingPosition) {
             counter += checkFourInArray(move.getChessColor(), 0, array);
-            if (counter == 2) {
+            if (counter >= 2) {
                 return true;
             }
         }
