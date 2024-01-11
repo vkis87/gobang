@@ -1,5 +1,5 @@
 # gobang
-基於其他人開發的五子棋，加入偵測部分禁手的功能。
+基於其他人開發的五子棋，加入偵測部分禁手以及AI敵人。
 <h2>class Move</h2>
 <p>constructor: Move(int x, int y, int chessColor)</p>
 <p>用於給ForbiddenChecker檢查用之落子點及顏色</p>
