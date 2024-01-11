@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,6 +23,8 @@ public class Windows extends JFrame implements MouseListener {
     private int initiative = this.var;
     private ForbiddenChecker initiativeChecker;
     private ForbiddenChecker goteChecker;
+    private boolean isAiActivate = true;
+    private int aiVar = 1;
 
     public Windows(String title) {
         super(title);
@@ -86,53 +89,123 @@ public class Windows extends JFrame implements MouseListener {
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
         if (e.getX() < (45 + (coreSizeY - 1) * 30)
-        && e.getY() < (75 + (coreSizeX - 1) * 30)
-        && e.getX() > 15 && e.getY() > 45 ) {
+                && e.getY() < (75 + (coreSizeX - 1) * 30)
+                && e.getX() > 15 && e.getY() > 45) {
             int x = _CgetX(e.getX());
             int y = _CgetY(e.getY());
-            if(!core.__CanInput(x, y)) {
+            if (!core.__CanInput(x, y)) {
                 return;
             }
             // 檢查禁手
             Move move = new Move(x, y, var);
-            if(var == this.initiative && this.initiativeChecker.check(core, move)) {
-                JOptionPane.showMessageDialog(null, this.initiativeChecker.getCheckMessage(), "禁手", JOptionPane.DEFAULT_OPTION);
-            } else if(var != this.initiative && this.goteChecker.check(core, move)) {
-                JOptionPane.showMessageDialog(null, this.goteChecker.getCheckMessage(), "禁手", JOptionPane.DEFAULT_OPTION);
+            if (var == this.initiative && this.initiativeChecker.check(core, move)) {
+                JOptionPane.showMessageDialog(null, this.initiativeChecker.getCheckMessage(), "禁手",
+                        JOptionPane.DEFAULT_OPTION);
+            } else if (var != this.initiative && this.goteChecker.check(core, move)) {
+                JOptionPane.showMessageDialog(null, this.goteChecker.getCheckMessage(), "禁手",
+                        JOptionPane.DEFAULT_OPTION);
             }
             int a = core.ChessIt(x, y, var);
             this.repaint();
             if (a == 1) {
-                JOptionPane.showMessageDialog(null,"白的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);;
+                JOptionPane.showMessageDialog(null, "白的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+                ;
             }
-            if(a==2) {
-                JOptionPane.showMessageDialog(null,"黑的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);;
+            if (a == 2) {
+                JOptionPane.showMessageDialog(null, "黑的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+                ;
             }
-            if(a!=-1) {
-                if(var==1) var=2;
-                else if(var==2) var=1;
+            if (a != -1) {
+                if (var == 1)
+                    var = 2;
+                else if (var == 2)
+                    var = 1;
+
+                if (this.isAiActivate && this.aiVar == this.var) {
+                    this.AI_Move_Chess();
+                    
+                }
             }
-        }
-        else if(e.getX()>690&&e.getX()<760&&e.getY()>60&&e.getY()<90) {
+        } else if (e.getX() > 690 && e.getX() < 760 && e.getY() > 60 && e.getY() < 90) {
             core.RetChess();
-            if(var==1) var=2;
-            else if(var==2) var=1;
+            if (var == 1)
+                var = 2;
+            else if (var == 2)
+                var = 1;
             this.repaint();
         }
-        if(e.getX()>690&&e.getX()<760&&e.getY()>120&&e.getY()<150) {
+        if (e.getX() > 690 && e.getX() < 760 && e.getY() > 120 && e.getY() < 150) {
             this.var = this.initiative;
             core.Restart();
+            if (this.isAiActivate && this.aiVar == this.var) {
+                this.AI_Move_Chess();
+
+            }
             this.repaint();
         }
-        if(e.getX()>690&&e.getX()<760&&e.getY()>180&&e.getY()<210) {
-            Object[] options = {"白先","黑先"};
-            int n = JOptionPane.showOptionDialog(null,"红先还是黑先？","游戏设置",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE, null,options,options[0]);
-            if(n==0) this.var=1;
-            if(n==1) this.var=2;
-            this.initiative = this.var;
+        if (e.getX() > 690 && e.getX() < 760 && e.getY() > 180 && e.getY() < 210) {
+            Object[] options1 = { "是", "否" };
+            Object[] options2 = { "白方", "黑方" };
+            int q1 = JOptionPane.showOptionDialog(null, "是否開啟AI", "AI設置", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options1, options1[0]);
+            if (q1 == 0) {
+                this.isAiActivate = true;
+                int q2 = JOptionPane.showOptionDialog(null, "選擇AI的顏色", "AI設置", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, options2, options2[0]);
+                if (q2 == 0) {
+                    this.aiVar = 1;// white is ai
+                } else if (q2 == 1) {
+                    this.aiVar = 2;// black is ai
+                }
+                JLabel label = new JLabel();
+            } else {
+                this.isAiActivate = false;
+            }
             this.core.Restart();
+            if (this.isAiActivate && this.aiVar == this.var) {
+                this.AI_Move_Chess();
+                
+            }
             this.repaint();
         }
+    }
+
+    private void AI_Move_Chess() {
+        if (this.var != this.aiVar)
+            return;
+        ChessAI ai = new ChessAI();
+        int[] move = ai.FindBestmove(this.core.getCore(), this.aiVar);
+        if(ai.CheckWin(this.core.getCore(), this.aiVar))
+        {
+            if(this.aiVar == 1)// white win
+            {
+                JOptionPane.showMessageDialog(null, "白的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+            }
+            else if(this.aiVar == 2)// black win
+            {
+                JOptionPane.showMessageDialog(null, "黑的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+            }
+            
+            return;
+        }
+        this.core.ChessIt(move[0], move[1], this.aiVar);
+        if(ai.CheckWin(this.core.getCore(), this.aiVar))
+        {
+            if(this.aiVar == 1)// white win
+            {
+                JOptionPane.showMessageDialog(null, "白的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+            }
+            else if(this.aiVar == 2)// black win
+            {
+                JOptionPane.showMessageDialog(null, "黑的赢了", "恭喜", JOptionPane.DEFAULT_OPTION);
+            }
+            
+            return;
+        }
+        if (var == 1)
+            var = 2;
+        else if (var == 2)
+            var = 1;
     }
 
     @Override
